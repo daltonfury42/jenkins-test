@@ -1,8 +1,8 @@
 version: 0.2
 env:
   variables:
-    COMPONENT = "master"
-    AWS_ECR_REPO = "065307277436.dkr.ecr.us-east-2.amazonaws.com/codebuild-experiment"
+    COMPONENT: "master"
+    AWS_ECR_REPO: "065307277436.dkr.ecr.us-east-2.amazonaws.com/codebuild-experiment"
 phases:
   install:
     runtime-versions:
