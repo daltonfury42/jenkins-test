@@ -9,8 +9,8 @@ phases:
       java: openjdk11
   pre_build:
     commands:
-      - "echo Logging in to Amazon ECR..."
-      - "$(aws ecr get-login --region us-east-1)"
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ECR_REPO
   build:
     commands:
       - echo Build started on `date`
