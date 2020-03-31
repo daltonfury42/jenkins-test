@@ -1,0 +1,28 @@
+version: 0.2
+env:
+  variables:
+    COMPONENT = "master"
+    AWS_ECR_REPO = "065307277436.dkr.ecr.us-east-2.amazonaws.com/codebuild-experiment"
+phases:
+  install:
+    runtime-versions:
+      java: openjdk11
+  pre_build:
+    commands:
+      - "echo Logging in to Amazon ECR..."
+      - "$(aws ecr get-login --region us-east-1)"
+  build:
+    commands:
+      - echo Build started on `date`
+      - mvn test 
+      - mvn package
+      - echo Build completed on `date`
+  post_build:
+    commands:
+      - echo Building docker image on `date`
+      - docker build . -t $COMPONENT
+      - docker tag $COMPONENT:latest $AWS_ECR_REPO
+      - docker push $AWS_ECR_REPO
+      - echo ECR push completed on `date`
+
+
