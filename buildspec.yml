@@ -22,7 +22,7 @@ phases:
       - echo Building docker image on `date`
       - echo $CODEBUILD_WEBHOOK_TRIGGER
       - |
-          if [[ -z "${CODEBUILD_WEBHOOK_TRIGGER}" ]] || [[ $CODEBUILD_WEBHOOK_TRIGGER == "branch/master"]]; then
+      if [[ -z "${CODEBUILD_WEBHOOK_TRIGGER}" ]] || [[ "$CODEBUILD_WEBHOOK_TRIGGER" = "branch/master" ]]; then
             docker build . -t $COMPONENT
             docker tag $COMPONENT:latest $AWS_ECR_REPO
             docker push $AWS_ECR_REPO
