@@ -1,35 +1,37 @@
-version: 0.2
-env:
-  variables:
-    COMPONENT: "master"
-    AWS_ECR_REPO: "065307277436.dkr.ecr.us-east-2.amazonaws.com/codebuild-experiment"
-phases:
-  install:
-    runtime-versions:
-      java: openjdk11
-  pre_build:
-    commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ECR_REPO
-  build:
-    commands:
-      - echo Build started on `date`
-      - mvn test 
-      - mvn package
-      - echo Build completed on `date`
-  post_build:
-    commands:
-      - echo Building docker image on `date`
-      - echo $CODEBUILD_WEBHOOK_TRIGGER
-      - |
-      if [[ -z "${CODEBUILD_WEBHOOK_TRIGGER}" ]] || [[ "$CODEBUILD_WEBHOOK_TRIGGER" = "branch/master" ]]; then
-            docker build . -t $COMPONENT
-            docker tag $COMPONENT:latest $AWS_ECR_REPO
-            docker push $AWS_ECR_REPO
-            echo ECR push completed on `date`
-          else
-            echo Skipped ECR push as CODEBUILD_WEBHOOK_TRIGGER set to $CODEBUILD_WEBHOOK_TRIGGER
-          fi
-cache:
-  paths:
-    - '/root/.m2/**/*'
+--- 
+  cache: 
+    paths: 
+      - /root/.m2/**/*
+  env: 
+    variables: 
+      AWS_ECR_REPO: 065307277436.dkr.ecr.us-east-2.amazonaws.com/codebuild-experiment
+      COMPONENT: master
+  phases: 
+    build: 
+      commands: 
+        - "echo Build started on `date`"
+        - "mvn test"
+        - "mvn package"
+        - "echo Build completed on `date`"
+    install: 
+      runtime-versions: 
+        java: openjdk11
+    post_build: 
+      commands: 
+        - "echo Building docker image on `date`"
+        - "echo $CODEBUILD_WEBHOOK_TRIGGER"
+        - |
+            if [[ -z "${CODEBUILD_WEBHOOK_TRIGGER}" ]] || [[ "$CODEBUILD_WEBHOOK_TRIGGER" = "branch/master" ]]; then
+              docker build . -t $COMPONENT
+              docker tag $COMPONENT:latest $AWS_ECR_REPO
+              docker push $AWS_ECR_REPO
+              echo ECR push completed on `date`
+            else
+              echo Skipped ECR push as CODEBUILD_WEBHOOK_TRIGGER set to $CODEBUILD_WEBHOOK_TRIGGER
+            fi
+    pre_build: 
+      commands: 
+        - "echo Logging in to Amazon ECR..."
+        - "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ECR_REPO"
+  version: 0.2
+  
