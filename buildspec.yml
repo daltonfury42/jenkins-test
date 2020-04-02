@@ -20,6 +20,8 @@
               docker tag $COMPONENT:latest $AWS_ECR_REPO
               docker push $AWS_ECR_REPO
               echo ECR push completed on `date`
+              echo Generating imagedefinitions.json
+              printf '[{"name":"cicd-container","imageUri":"$AWS_ECR_REPO:latest"}]' > imagedefinitions.json
             else
               echo Skipped ECR push as CODEBUILD_WEBHOOK_TRIGGER set to $CODEBUILD_WEBHOOK_TRIGGER
             fi
@@ -30,5 +32,8 @@
       commands: 
         - "echo Logging in to Amazon ECR..."
         - "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $AWS_ECR_REPO"
+  artifacts:
+    files:
+      - imagedefinitions.json
   version: 0.2
   
